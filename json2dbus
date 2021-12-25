@@ -10,6 +10,8 @@ from dbussy import DBUS
 conn = dbus.Connection.bus_get (DBUS.BUS_SESSION, private = False)
 conn.attach_asyncio()
 for line in sys.stdin:
+    if not line.rstrip("\n"):
+        break
     parsed = json.loads(line.rstrip("\n"))
 
     message = dbus.Message.new_method_call (
