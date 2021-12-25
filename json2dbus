@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+
+import getopt
+import json
+import sys
+
+import dbussy as dbus
+from dbussy import DBUS
+
+conn = dbus.Connection.bus_get (DBUS.BUS_SESSION, private = False)
+conn.attach_asyncio()
+for line in sys.stdin:
+    parsed = json.loads(line.rstrip("\n"))
+
+    message = dbus.Message.new_method_call (
+        destination = dbus.valid_bus_name(parsed["destination"]),
+        path = dbus.valid_path(parsed["path"]),
+        iface = parsed["interface"],
+        method = parsed["method"]
+    )
+    if "signature" in parsed and "objects" in parsed:
+        message.append_objects(parsed["signature"],*parsed["objects"])
+    await_reply = conn.send_await_reply(message)
+    reply = conn.loop.run_until_complete(await_reply)
+    # for obj in reply.objects:
+    #     print(obj, type(obj), file=sys.stderr, flush=True)
+    # TODO this needs to be recursive
+    objlist = [
+        o[1] if type(o) == tuple else o
+        for o in reply.objects
+    ]
+    printing_answer = {
+        "sender": reply.sender,
+        "serial": reply.serial,
+        "type": reply.type,
+        "signature": str(reply.signature),
+        # "destination": reply.destination,
+        "objects": objlist
+    }
+    print(json.dumps(printing_answer), flush=True)

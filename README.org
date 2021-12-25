@@ -1,0 +1,14 @@
+#+TITLE: json2dbus
+
+Json2dbus is a tool to translate JSON lines to DBUS messages.
+
+* Examples
+
+#+begin_example
+{"destination": "org.freedesktop.systemd1", "path":"/", "method": "Introspect", "interface": "org.freedesktop.DBus.Introspectable"}
+{"destination": "org.freedesktop.systemd1", "path":"/org/freedesktop/systemd1", "method": "GetMachineId", "interface": "org.freedesktop.DBus.Peer"}
+#+end_example
+
+* LICENSE
+
+[[file:LICENSE][AGPL3]]
