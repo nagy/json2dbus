@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import asyncio
 import getopt
 import json
 import sys
@@ -7,36 +8,92 @@ import sys
 import dbussy as dbus
 from dbussy import DBUS
 
+loop = asyncio.get_event_loop()
 conn = dbus.Connection.bus_get (DBUS.BUS_SESSION, private = False)
-conn.attach_asyncio()
-for line in sys.stdin:
-    if not line.rstrip("\n"):
-        break
-    parsed = json.loads(line.rstrip("\n"))
 
-    message = dbus.Message.new_method_call (
-        destination = dbus.valid_bus_name(parsed["destination"]),
-        path = dbus.valid_path(parsed["path"]),
-        iface = parsed["interface"],
-        method = parsed["method"]
-    )
-    if "signature" in parsed and "objects" in parsed:
-        message.append_objects(parsed["signature"],*parsed["objects"])
-    await_reply = conn.send_await_reply(message)
-    reply = conn.loop.run_until_complete(await_reply)
-    # for obj in reply.objects:
-    #     print(obj, type(obj), file=sys.stderr, flush=True)
-    # TODO this needs to be recursive
+def handle_message(conn, message, user_data) :
     objlist = [
         o[1] if type(o) == tuple else o
-        for o in reply.objects
+        for o in message.objects
     ]
-    printing_answer = {
-        "sender": reply.sender,
-        "serial": reply.serial,
-        "type": reply.type,
-        "signature": str(reply.signature),
+    printing_answer = json.dumps({
+        "sender": message.sender,
+        "serial": message.serial,
+        "type": message.type,
+        # "path": message.path,
+        "interface": message.interface,
+        "member": message.member,
+        "signature": str(message.signature),
         # "destination": reply.destination,
         "objects": objlist
-    }
-    print(json.dumps(printing_answer), flush=True)
+    })
+    print(printing_answer, flush=True)
+
+conn.attach_asyncio(loop)
+conn.enable_receive_message([DBUS.MESSAGE_TYPE_METHOD_CALL,
+                             DBUS.MESSAGE_TYPE_METHOD_RETURN,
+                             DBUS.MESSAGE_TYPE_ERROR,
+                             DBUS.MESSAGE_TYPE_SIGNAL])
+async def myhandler():
+    async for message in conn.iter_messages_async():
+        handle_message(conn, message, None)
+
+
+async def connect_stdin_stdout():
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)
+    writer = asyncio.StreamWriter(w_transport, w_protocol, reader, loop)
+    return reader, writer
+
+
+async def main():
+    reader, writer = await connect_stdin_stdout()
+    while True:
+        try:
+            res = await reader.readuntil()
+        except asyncio.exceptions.IncompleteReadError as e:
+            break
+        if not res:
+            break
+        parsed = json.loads(res.decode().rstrip("\n"))
+        print("type_json",parsed, file=sys.stderr, flush=True)
+        if parsed["type"] == 2: # method reply
+            message = dbus.Message.new_method_call(
+                destination = dbus.valid_bus_name(":1.1"),
+                path = dbus.valid_path(parsed["path"]),
+                iface = parsed["interface"],
+                method = parsed["member"],
+            )
+            message.serial = parsed["serial"]
+            message.reply_serial = parsed["serial"]
+            message = message.new_method_return()
+            message.destination = parsed["destination"]
+            message.interface = parsed["interface"]
+            message.path = parsed["path"]
+        else:
+            message = dbus.Message.new_method_call(
+                destination = dbus.valid_bus_name(parsed["destination"]),
+                path = dbus.valid_path(parsed["path"]),
+                iface = parsed["interface"],
+                method = parsed["member"])
+        if "signature" in parsed and "objects" in parsed:
+            message.append_objects(parsed["signature"],*parsed["objects"])
+        # print("type_marshall", message.marshal(), file=sys.stderr, flush=True)
+        conn.send(message)
+
+try :
+    loop.run_until_complete(asyncio.wait([main(), myhandler() ], return_when=asyncio.FIRST_COMPLETED))
+except asyncio.CancelledError:
+    pass
+except KeyboardInterrupt :
+    for task in asyncio.all_tasks(loop):
+        task.cancel()
+        try :
+            loop.run_until_complete(task)
+        except asyncio.CancelledError :
+            pass
+finally:
+    loop.close()
