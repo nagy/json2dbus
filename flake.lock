@@ -15,19 +15,34 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "locked": {
+        "lastModified": 1638122382,
+        "narHash": "sha256-sQzZzAbvKEqN9s0bzWuYmRaA03v40gaJ4+iL1LXjaeI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "74f7e4319258e287b0f9cb95426c9853b282730b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "nagynur": {
       "inputs": {
+        "flake-utils": "flake-utils_2",
         "nixpkgs": [
           "nixpkgs"
-        ],
-        "nur": "nur"
+        ]
       },
       "locked": {
-        "lastModified": 1640469760,
-        "narHash": "sha256-S4t5GbNHXLGuri3RGcP/1aIQyC5ZA2qj6RgNdNycxb0=",
+        "lastModified": 1640474322,
+        "narHash": "sha256-HCAxiLLj8UcTIWycseK31URSx7GDeGHoIxTvmw4Ta7Q=",
         "owner": "nagy",
         "repo": "nur-packages",
-        "rev": "5d268f202a3d218b7fbda0ceed528327acca03cb",
+        "rev": "976784ff4bd862955359b28998d3740c55f85935",
         "type": "github"
       },
       "original": {
@@ -38,11 +53,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1640319671,
-        "narHash": "sha256-ZkKmakwaOaLiZOpIZWbeJZwap5CzJ30s4UJTfydYIYc=",
+        "lastModified": 1640540585,
+        "narHash": "sha256-cCmknKFjWgam9jq+58wSd0Z4REia8mjBP65kXcL3ki8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "eac07edbd20ed4908b98790ba299250b5527ecdf",
+        "rev": "ac169ec6371f0d835542db654a65e0f2feb07838",
         "type": "github"
       },
       "original": {
@@ -50,20 +65,6 @@
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
-      }
-    },
-    "nur": {
-      "locked": {
-        "lastModified": 1640463732,
-        "narHash": "sha256-9xakgOvzBvR/e9MX6LJJg5D35RjvWCY6E41k6yUo/Lg=",
-        "owner": "nix-community",
-        "repo": "NUR",
-        "rev": "767df3ef1bb4e2820c2bf8eca1ab89b69d754549",
-        "type": "github"
-      },
-      "original": {
-        "id": "nur",
-        "type": "indirect"
       }
     },
     "root": {
