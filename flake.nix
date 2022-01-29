@@ -4,6 +4,7 @@
     nagynur.url = "github:nagy/nur-packages";
     nagynur.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = { self, nixpkgs, nagynur, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
@@ -15,7 +16,7 @@
             src = self;
             buildInputs = [
               (python3.withPackages
-                (ps: with ps; [ nagynur.packages.${system}.dbussy ]))
+                (ps: with ps; [ nagynur.legacyPackages.${system}.python3Packages.dbussy ]))
             ];
             buildPhase = ''
               patchShebangs json2dbus
