@@ -10,26 +10,26 @@
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
       in with pkgs; rec {
-        defaultPackage =
-          stdenvNoCC.mkDerivation rec {
-            name = "json2dbus";
-            src = self;
-            buildInputs = [
-              (python3.withPackages
-                (ps: with ps; [ nagynur.legacyPackages.${system}.python3Packages.dbussy ]))
-            ];
-            buildPhase = ''
-              patchShebangs json2dbus
-            '';
-            installPhase = ''
-              install -Dm755 json2dbus $out/bin/json2dbus
-            '';
-            meta = {
-              description = "A tool to translate JSON lines to DBUS messages";
-              license = nixpkgs.lib.licenses.agpl3;
-              platforms = nixpkgs.lib.platforms.linux;
-              homepage = "https://github.com/nagy/json2dbus";
-            };
+        defaultPackage = stdenvNoCC.mkDerivation rec {
+          name = "json2dbus";
+          src = self;
+          buildInputs = [
+            (python3.withPackages (ps:
+              with ps;
+              [ nagynur.legacyPackages.${system}.python3Packages.dbussy ]))
+          ];
+          buildPhase = ''
+            patchShebangs json2dbus
+          '';
+          installPhase = ''
+            install -Dm755 json2dbus $out/bin/json2dbus
+          '';
+          meta = {
+            description = "A tool to translate JSON lines to DBUS messages";
+            license = nixpkgs.lib.licenses.agpl3;
+            platforms = nixpkgs.lib.platforms.linux;
+            homepage = "https://github.com/nagy/json2dbus";
           };
+        };
       });
 }

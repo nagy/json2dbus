@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 import asyncio
-import getopt
 import json
 import sys
+from subprocess import PIPE, Popen
 
 import dbussy as dbus
 from dbussy import DBUS
-
-from subprocess import PIPE, run, Popen
 
 
 def encode_message(message):
@@ -48,7 +46,7 @@ async def main(input):
     while True:
         try:
             res = await reader.readuntil()
-        except asyncio.exceptions.IncompleteReadError as e:
+        except asyncio.exceptions.IncompleteReadError:
             break
         if not res:
             break
