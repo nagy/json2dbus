@@ -102,6 +102,7 @@ try:
     if len(sys.argv) == 1:
         input = sys.stdin
         output = sys.stdout
+        proc = None
     else:
         proc = Popen(sys.argv[1:], stdout=PIPE, stdin=PIPE, text=True)
         input = proc.stdout
@@ -122,5 +123,6 @@ except KeyboardInterrupt:
         except asyncio.CancelledError:
             pass
 finally:
-    proc.wait()
+    if proc:
+        proc.wait()
     loop.close()
