@@ -5,7 +5,7 @@
         inherit system;
         overlays = [ nur.overlay ];
       }; {
-        defaultPackage = stdenvNoCC.mkDerivation {
+        packages.default = stdenvNoCC.mkDerivation {
           name = "json2dbus";
           src = self;
           buildInputs = [
