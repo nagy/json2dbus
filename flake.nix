@@ -13,7 +13,9 @@
               (ps: [ pkgs.nur.repos.nagy.python3Packages.dbussy ]))
           ];
           installPhase = ''
+            runHook preInstall
             install -Dm755 json2dbus $out/bin/json2dbus
+            runHook postInstall
           '';
           meta = with lib; {
             description = "A tool to translate JSON lines to DBUS messages";
