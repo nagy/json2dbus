@@ -1,4 +1,6 @@
 {
+  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+
   outputs = { self, nixpkgs, nur, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       with import nixpkgs {
