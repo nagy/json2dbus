@@ -7,7 +7,7 @@
         inherit system;
         overlays = [ nur.overlay ];
       }; {
-        packages.default = stdenvNoCC.mkDerivation {
+        packages.default = stdenv.mkDerivation {
           name = "json2dbus";
           src = self;
           buildInputs = [
@@ -16,7 +16,7 @@
           ];
           installPhase = ''
             runHook preInstall
-            install -Dm755 json2dbus $out/bin/json2dbus
+            install -Dm555 json2dbus $out/bin/json2dbus
             runHook postInstall
           '';
           meta = with lib; {
